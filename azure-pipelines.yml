@@ -1,0 +1,23 @@
+# Define variables for login server and image path (secure option)
+variables:
+  loginServer: $(ACR_LOGIN_SERVER)  # Replace with actual variable name
+  imagePath: $(ACR_IMAGE_PATH)  # Replace with actual variable name
+
+# Pipeline jobs and steps
+pool:
+  vmImage: 'ubuntu-latest'  # Ensure your agent pool supports Linux
+
+jobs:
+- job: Build_and_Run
+
+  # Steps to pull and run the container
+  steps:
+  - task: Docker@0
+    inputs:
+      containerRegistryType: 'Azure Container Registry'
+      azureSubscriptionConnection: 'azure-connections'  # Replace if needed
+      imageName: ${{ variables.loginServer }}/{{ variables.imagePath }}:latest
+      command: 'pull'
+
+  - script: docker run ${{ variables.loginServer }}/{{ variables.imagePath }}:latest
+    displayName: Run Containerized Python App
